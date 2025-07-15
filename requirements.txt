@@ -12,6 +12,9 @@ requests==2.31.0
 gtts==2.5.4
 SpeechRecognition==3.10.0
 
+# Authentication
+bcrypt==4.1.2
+
 # Production WSGI server
 gunicorn==20.1.0
 
