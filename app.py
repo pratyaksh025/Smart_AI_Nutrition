@@ -11,7 +11,7 @@ from utils.auth import auth_blueprint, USER_CSV # Import USER_CSV from auth
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import GEMINI_API_KEY
+from secrets_config import GEMINI_API_KEY
 
 
 app = Flask(__name__)
