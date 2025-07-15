@@ -16,3 +16,6 @@ SpeechRecognition==3.10.0
 
 # Data handling
 pandas==2.0.3
+
+
+gunicorn
