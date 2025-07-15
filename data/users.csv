@@ -1,0 +1,2 @@
+user_id,name,email,hashed_password,age,gender,diet,goal,height_cm,weight_kg,bmi,medical_conditions,preferred_language
+user_1,Pratyaksh Yadav,ypratyaksh59@gmail.com,$2b$12$/KAgVZx7Qa/7rCYyFjB3BenP1lZaJGs3gMAfCb//Uw5AEevYRhuwq,22,Male,Vegetarian,Overall Wellness,174.0,89.0,29.4,,hi-IN

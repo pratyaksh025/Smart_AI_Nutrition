@@ -1,0 +1,1414 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutrition Assistant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Google Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #0d62c9;
+      --background: #1e1e1e;
+      --chat-bg: #292a2d;
+      --user-bubble: #1a73e8;
+      --bot-bubble: #303134;
+      --text-primary: #e8eaed;
+      --text-secondary: #9aa0a6;
+      --border: #5f6368;
+      --input-bg: #3c4043;
+      --accent: #34a853;
+      --warning: #fbbc05;
+    }
+
+    /* Video background styles */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      z-index: -1;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: rgba(41, 42, 45, 0.8);
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap; /* Allow user info items to wrap */
+      justify-content: flex-end; /* Align to end when wrapped */
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+
+    .logout-btn, .edit-profile-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+
+    .logout-btn:hover, .edit-profile-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Language selector and search styles */
+    .language-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-left: 20px;
+      min-width: 150px; /* Ensure it doesn't get too small */
+    }
+
+    .language-search {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .language-search::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .language-selector {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      cursor: pointer;
+      appearance: none; /* Remove default select arrow */
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e8eaed%22%20d%3D%22M287%2C114.7L153.2%2C248.5c-3.2%2C3.2-8.3%2C3.2-11.6%2C0L5.4%2C114.7c-3.2-3.2-3.2-8.3%2C0-11.6l11.6-11.6c3.2-3.2%2C8.3-3.2%2C11.6%2C0l120.7%2C120.7l120.7-120.7c3.2-3.2%2C8.3-3.2%2C11.6%2C0l11.6%2C11.6C290.2%2C106.4%2C290.2%2C111.5%2C287%2C114.7z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      padding-right: 25px; /* Make space for the arrow */
+    }
+
+    .language-selector option {
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+    }
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background-color: rgba(41, 42, 45, 0.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+    }
+
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 400;
+      margin-bottom: 16px;
+      color: #b8eaff;
+      text-shadow: 0 0 10px #4fc3f7, 0 0 20px #00e5ff;
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .capabilities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .capability {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      width: calc(50% - 20px);
+      min-width: 250px;
+      text-align: center;
+      transition: transform 0.2s;
+      backdrop-filter: blur(5px);
+    }
+
+    .capability:hover {
+      transform: translateY(-5px);
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .capability i {
+      font-size: 32px;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+
+    .capability h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .capability p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .message {
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      gap: 16px;
+      padding: 16px 24px;
+      border-radius: 16px;
+      backdrop-filter: blur(5px);
+    }
+
+    .user .message {
+      background-color: rgba(26, 115, 232, 0.2);
+    }
+
+    .bot .message {
+      background-color: rgba(32, 33, 36, 0.6);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden; /* Ensure image stays within bounds */
+    }
+
+    .user .avatar {
+      background-color: var(--user-bubble);
+    }
+
+    .bot .avatar {
+      background-color: transparent; /* Changed to transparent for image */
+      /* No longer needs to display an icon directly */
+    }
+
+    .bot .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Adjust as needed: cover, contain, fill, etc. */
+    }
+
+    .message-content {
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    .message-content p {
+      margin-bottom: 12px;
+    }
+
+    .message-content ul, .message-content ol {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    .message-content li {
+      margin-bottom: 8px;
+    }
+
+    .message-content code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .nutrition-table {
+      margin: 15px 0;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .nutrition-table th, .nutrition-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nutrition-table th {
+      color: var(--accent);
+    }
+
+    .meal-option {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .meal-option h4 {
+      color: var(--warning);
+      margin-bottom: 10px;
+      font-weight: bold; /* Ensure meal option headings are bold */
+    }
+
+    .thinking {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* UPDATED DOT-FLASHING FOR A MORE GEMINI-LIKE EFFECT */
+    .dot-flashing {
+      position: relative;
+      width: 8px; /* Slightly smaller dots */
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      animation: dotPulse 1.5s infinite ease-in-out; /* Slower, smoother pulse */
+      animation-delay: 0s;
+    }
+
+    .dot-flashing::before, .dot-flashing::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      animation: dotPulse 1.5s infinite ease-in-out;
+    }
+
+    .dot-flashing::before {
+      left: -12px; /* Closer spacing */
+      animation-delay: 0.2s; /* Staggered delay */
+    }
+
+    .dot-flashing::after {
+      left: 12px; /* Closer spacing */
+      animation-delay: 0.4s; /* Staggered delay */
+    }
+
+    @keyframes dotPulse {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+    /* END UPDATED DOT-FLASHING */
+
+    .input-container {
+      padding: 24px;
+      background-color: rgba(41, 42, 45, 0.8);
+      border-top: 1px solid var(--border);
+      position: sticky;
+      bottom: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .input-area {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .input-wrapper {
+      background-color: var(--input-bg);
+      border-radius: 24px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      border: 1px solid transparent;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--primary);
+    }
+
+    .input-field {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 16px;
+      padding: 12px 8px;
+      outline: none;
+      resize: none;
+      max-height: 200px;
+      height: 24px;
+      overflow-y: auto; /* Allow text area to scroll if content exceeds max-height */
+    }
+        
+    /* Add these new styles */
+    .feedback-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    
+    .feedback-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 16px;
+      padding: 6px 12px;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .feedback-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .like-btn {
+      color: var(--accent);
+    }
+    
+    .dislike-btn {
+      color: #ea4335;
+    }
+    
+    .feedback-btn i {
+      font-size: 12px;
+    }
+    
+    .feedback-thanks {
+      font-size: 12px;
+      color: var(--accent);
+      margin-top: 8px;
+      display: none;
+    }
+
+    .input-field::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .file-upload, .microphone-btn { /* Added microphone-btn */
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 8px;
+      border-radius: 50%;
+    }
+
+    .file-upload:hover, .microphone-btn:hover { /* Added microphone-btn */
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .microphone-btn.recording {
+      color: #ea4335; /* Red when recording */
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .send-button {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .send-button:hover {
+      background-color: rgba(26, 115, 232, 0.1);
+    }
+
+    .send-button:disabled {
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    /* Speak button for bot messages */
+    .speak-message-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 16px;
+      margin-left: 10px;
+      padding: 5px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .speak-message-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    .speak-message-btn:active {
+      color: var(--primary); /* Highlight when active */
+    }
+
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .suggestion {
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .suggestion:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    @media (max-width: 768px) {
+      .capability {
+        width: 100%;
+      }
+      
+      .message {
+        padding: 12px 16px;
+      }
+      
+      .header {
+        padding: 12px 16px;
+        flex-wrap: wrap; /* Allow wrapping for smaller screens */
+      }
+      .user-info {
+        margin-top: 10px; /* Add some space when wrapped */
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .language-controls { /* Adjust for smaller screens */
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+      }
+      .input-wrapper {
+        flex-wrap: wrap;
+      }
+      .input-field {
+        width: calc(100% - 80px); /* Adjust width for buttons */
+      }
+      .file-upload, .microphone-btn, .send-button {
+        flex-shrink: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<video autoplay muted loop class="video-bg">
+  <source src="{{ url_for('static', filename='videos/chat.mp4') }}" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div class="header">
+  <div class="logo-container">
+    <div class="logo">G</div>
+    <h1 class="title">Nutrition Assistant</h1>
+  </div>
+  <div class="user-info">
+    <div class="language-controls">
+      <input type="text" id="languageSearch" class="language-search" placeholder="Search language...">
+      <select id="languageSelector" class="language-selector">
+        </select>
+    </div>
+    <a href="{{ url_for('auth.edit_profile') }}" class="edit-profile-btn">
+      <i class="fas fa-user-edit"></i>
+      <span>Edit Profile</span>
+    </a>
+    <div class="user-avatar">{{ session['name'][0]|upper if session['name'] else 'U' }}</div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</div>
+
+<div class="chat-container" id="chatContainer">
+  <div class="welcome-message">
+    <h2 class="welcome-title">Hello, {{ session['name'] }}!</h2>
+    <p class="welcome-text">I'm your AI Nutrition Assistant. Ask me anything about food, nutrition, or upload a food image for analysis.</p>
+    
+    <div class="capabilities">
+      <div class="capability">
+        <i class="fas fa-utensils"></i>
+        <h3>Food Analysis</h3>
+        <p>Upload food images to get detailed nutritional information and calorie estimates.</p>
+      </div>
+      <div class="capability">
+        <i class="fas fa-apple-alt"></i>
+        <h3>Nutrition Advice</h3>
+        <p>Get personalized dietary recommendations based on your health goals.</p>
+      </div>
+      <div class="capability">
+        <i class="fas fa-book"></i>
+        <h3>Recipe Ideas</h3>
+        <p>Discover healthy recipes tailored to your dietary preferences and restrictions.</p>
+      </div>
+      <div class="capability">
+        <i class="fas fa-heartbeat"></i>
+        <h3>Health Tracking</h3>
+        <p>Track your nutritional intake and get insights for better health management.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="message bot">
+    <div class="avatar">
+      <img src="static/images/bot.gif" alt="Bot Avatar"> 
+    </div>
+    <div class="message-content" data-raw-content="Hello! I'm your Nutrition Assistant. How can I help you today? You can ask me about: Nutritional information for specific foods; Healthy meal ideas (breakfast, lunch, dinner); Complete meal plans for the day; Dietary advice for specific goals (weight loss, muscle gain, etc.); Analysis of food images; General health and nutrition questions. Try asking something like: 'Suggest 3 healthy breakfast options' or 'What's a good meal plan for weight loss?'">
+      <p>Hello! I'm your Nutrition Assistant. How can I help you today? You can ask me about:</p>
+      <ul>
+        <li>Nutritional information for specific foods</li>
+        <li>Healthy meal ideas (breakfast, lunch, dinner)</li>
+        <li>Complete meal plans for the day</li>
+        <li>Dietary advice for specific goals (weight loss, muscle gain, etc.)</li>
+        <li>Analysis of food images</li>
+        <li>General health and nutrition questions</li>
+      </ul>
+      <p>Try asking something like: "Suggest 3 healthy breakfast options" or "What's a good meal plan for weight loss?"</p>
+    </div>
+  </div>
+</div>
+
+<div class="input-container">
+  <div class="input-area">
+    <form id="chatForm" enctype="multipart/form-data">
+      <div class="input-wrapper">
+        <label for="food_image" class="file-upload">
+          <i class="fas fa-image"></i>
+        </label>
+        <input type="file" id="food_image" name="food_image" accept="image/*" style="display: none;">
+        
+        <button type="button" class="microphone-btn" id="microphoneBtn" title="Start Speech Input">
+          <i class="fas fa-microphone"></i>
+        </button>
+
+        <textarea class="input-field" id="userInput" name="user_text" placeholder="Message Nutrition Assistant..." rows="1"></textarea>
+        <button type="submit" class="send-button" id="sendButton" title="Send Message">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      </form>
+    
+    <div class="suggestions">
+      <div class="suggestion">Suggest 3 breakfast options</div>
+      <div class="suggestion">Analyze this food image</div>
+      <div class="suggestion">Meal plan for weight loss</div>
+      <div class="suggestion">Benefits of intermittent fasting</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM Content Loaded. Initializing chat.");
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const fileInput = document.getElementById('food_image');
+    const fileUpload = document.querySelector('.file-upload');
+    const suggestions = document.querySelectorAll('.suggestion');
+    const chatForm = document.getElementById('chatForm');
+    const languageSelector = document.getElementById('languageSelector');
+    const languageSearch = document.getElementById('languageSearch');
+    const microphoneBtn = document.getElementById('microphoneBtn');
+
+    let recognition;
+    let isRecording = false;
+
+    // --- Language Options (Expanded List) ---
+    const languages = [
+      { code: 'en-US', name: 'English (United States)' },
+      { code: 'en-GB', name: 'English (United Kingdom)' },
+      { code: 'hi-IN', name: 'Hindi (India)' },
+      { code: 'es-ES', name: 'Spanish (Spain)' },
+      { code: 'es-MX', name: 'Spanish (Mexico)' },
+      { code: 'fr-FR', name: 'French (France)' },
+      { code: 'de-DE', name: 'German (Germany)' },
+      { code: 'ja-JP', name: 'Japanese (Japan)' },
+      { code: 'zh-CN', name: 'Chinese (Mandarin, Simplified)' },
+      { code: 'zh-TW', name: 'Chinese (Taiwan, Traditional)' },
+      { code: 'ko-KR', name: 'Korean (South Korea)' },
+      { code: 'pt-PT', name: 'Portuguese (Portugal)' },
+      { code: 'pt-BR', name: 'Portuguese (Brazil)' },
+      { code: 'ru-RU', name: 'Russian (Russia)' },
+      { code: 'ar-SA', name: 'Arabic (Saudi Arabia)' },
+      { code: 'it-IT', name: 'Italian (Italy)' },
+      { code: 'nl-NL', name: 'Dutch (Netherlands)' },
+      { code: 'sv-SE', name: 'Swedish (Sweden)' },
+      { code: 'pl-PL', name: 'Polish (Poland)' },
+      { code: 'tr-TR', name: 'Turkish (Turkey)' },
+      { code: 'th-TH', name: 'Thai (Thailand)' },
+      { code: 'vi-VN', name: 'Vietnamese (Vietnam)' },
+      { code: 'id-ID', name: 'Indonesian (Indonesia)' },
+      { code: 'ms-MY', name: 'Malay (Malaysia)' },
+      { code: 'fil-PH', name: 'Filipino (Philippines)' },
+      { code: 'da-DK', name: 'Danish (Denmark)' },
+      { code: 'fi-FI', name: 'Finnish (Finland)' },
+      { code: 'no-NO', name: 'Norwegian (Norway)' },
+      { code: 'he-IL', name: 'Hebrew (Israel)' },
+      { code: 'el-GR', name: 'Greek (Greece)' },
+      { code: 'hu-HU', name: 'Hungarian (Hungary)' },
+      { code: 'cs-CZ', name: 'Czech (Czech Republic)' },
+      { code: 'sk-SK', name: 'Slovak (Slovakia)' },
+      { code: 'ro-RO', name: 'Romanian (Romania)' },
+      { code: 'bg-BG', name: 'Bulgarian (Bulgaria)' },
+      { code: 'uk-UA', name: 'Ukrainian (Ukraine)' },
+      { code: 'hr-HR', name: 'Croatian (Croatia)' },
+      { code: 'sr-RS', name: 'Serbian (Serbia)' },
+      { code: 'sl-SI', name: 'Slovenian (Slovenia)' },
+      { code: 'et-EE', name: 'Estonian (Estonia)' },
+      { code: 'lv-LV', name: 'Latvian (Latvia)' },
+      { code: 'lt-LT', name: 'Lithuanian (Lithuania)' },
+      { code: 'is-IS', name: 'Icelandic (Iceland)' },
+      { code: 'ga-IE', name: 'Irish (Ireland)' },
+      { code: 'cy-GB', name: 'Welsh (United Kingdom)' },
+      { code: 'fa-IR', name: 'Persian (Iran)' },
+      { code: 'ur-PK', name: 'Urdu (Pakistan)' },
+      { code: 'bn-BD', name: 'Bengali (Bangladesh)' },
+      { code: 'gu-IN', name: 'Gujarati (India)' },
+      { code: 'kn-IN', name: 'Kannada (India)' },
+      { code: 'ml-IN', name: 'Malayalam (India)' },
+      { code: 'mr-IN', name: 'Marathi (India)' },
+      { code: 'pa-IN', name: 'Punjabi (India)' },
+      { code: 'ta-IN', name: 'Tamil (India)' },
+      { code: 'te-IN', name: 'Telugu (India)' },
+    ];
+
+    function populateLanguageSelector(filter = '') {
+      languageSelector.innerHTML = ''; // Clear existing options
+      const lowerCaseFilter = filter.toLowerCase();
+
+      const filteredLanguages = languages.filter(lang => 
+        lang.name.toLowerCase().includes(lowerCaseFilter) || 
+        lang.code.toLowerCase().includes(lowerCaseFilter)
+      );
+
+      filteredLanguages.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang.code;
+        option.textContent = lang.name;
+        languageSelector.appendChild(option);
+      });
+    }
+
+    // Initial population
+    populateLanguageSelector();
+
+    // Language search functionality
+    languageSearch.addEventListener('input', function() {
+      populateLanguageSelector(this.value);
+      // If only one option remains and it matches, select it
+      if (languageSelector.options.length === 1 && languageSelector.options[0].textContent.toLowerCase().includes(this.value.toLowerCase())) {
+        languageSelector.value = languageSelector.options[0].value;
+      }
+    });
+
+    // --- Language Persistence and Initialization ---
+    // Fetch user's preferred language from the backend on page load
+    fetch('/api/user/preferences')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success' && data.preferences && data.preferences.preferred_language) {
+          const storedLang = data.preferences.preferred_language;
+          if (languageSelector) {
+            languageSelector.value = storedLang;
+            console.log("Set language from backend preference:", storedLang);
+          }
+        } else {
+          // Fallback to local storage if no backend preference or error
+          const storedLang = localStorage.getItem('preferredLanguage') || 'en-US';
+          if (languageSelector) {
+            languageSelector.value = storedLang;
+            console.log("Set language from local storage:", storedLang);
+          }
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching user preferences:", error);
+        // Fallback to local storage if backend fetch fails
+        const storedLang = localStorage.getItem('preferredLanguage') || 'en-US';
+        if (languageSelector) {
+          languageSelector.value = storedLang;
+          console.log("Set language from local storage (fallback):", storedLang);
+        }
+      });
+
+    // Save language preference on change (and send to backend)
+    if (languageSelector) {
+      languageSelector.addEventListener('change', function() {
+        const selectedLang = this.value;
+        localStorage.setItem('preferredLanguage', selectedLang);
+        console.log("Preferred language updated to:", selectedLang);
+        
+        // Send this update to the backend
+        fetch('/api/update_user_language_preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language: selectedLang })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log("Language preference saved on backend.");
+          } else {
+            console.error("Failed to save language preference on backend:", data.message);
+          }
+        })
+        .catch(error => {
+          console.error("Error sending language preference to backend:", error);
+        });
+
+        // Update speech recognition language
+        if (recognition) {
+          recognition.lang = selectedLang;
+          console.log("Speech recognition language updated to:", selectedLang);
+        }
+      });
+    }
+
+    // --- Speech-to-Text (STT) ---
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+
+      recognition.continuous = false; // Stop after a single utterance
+      recognition.interimResults = true; // Get interim results
+      recognition.lang = languageSelector ? languageSelector.value : 'en-US'; // Set initial language
+
+      recognition.onstart = () => {
+        isRecording = true;
+        microphoneBtn.classList.add('recording');
+        userInput.placeholder = "Listening...";
+        console.log("Speech recognition started.");
+      };
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        userInput.value = finalTranscript || interimTranscript;
+        userInput.dispatchEvent(new Event('input')); // Trigger resize
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        microphoneBtn.classList.remove('recording');
+        userInput.placeholder = "Message Nutrition Assistant...";
+        console.log("Speech recognition ended.");
+        // If final transcript is available, automatically submit
+        if (userInput.value.trim() !== '') {
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        isRecording = false;
+        microphoneBtn.classList.remove('recording');
+        userInput.placeholder = "Message Nutrition Assistant...";
+        addMessageToChat("Speech recognition error: " + event.error, 'bot');
+      };
+
+      microphoneBtn.addEventListener('click', () => {
+        if (isRecording) {
+          recognition.stop();
+          console.log("Stopping recording.");
+        } else {
+          // Update recognition language based on current selector value
+          recognition.lang = languageSelector ? languageSelector.value : 'en-US';
+          recognition.start();
+          console.log("Starting recording with language:", recognition.lang);
+        }
+      });
+    } else {
+      console.warn("Speech Recognition API not supported in this browser.");
+      microphoneBtn.style.display = 'none'; // Hide button if not supported
+    }
+
+    // --- Text-to-Speech (TTS) ---
+    const synth = window.speechSynthesis;
+    let voices = [];
+
+    function populateVoiceList() {
+      voices = synth.getVoices().sort(function (a, b) {
+          const aname = a.name.toUpperCase();
+          const bname = b.name.toUpperCase();
+          if ( aname < bname ) return -1;
+          else if ( aname == bname ) return 0;
+          else return +1;
+      });
+      // console.log("Available voices:", voices); // For debugging voices
+    }
+
+    populateVoiceList();
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = populateVoiceList;
+    }
+
+    function speakText(text, lang) {
+      if (synth.speaking) {
+        console.log('SpeechSynthesis is already speaking. Stopping current utterance.');
+        synth.cancel(); // Stop current speech before starting new one
+        return; // Exit function after stopping
+      }
+      if (text !== '') {
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.onend = function (event) {
+          console.log('SpeechSynthesisUtterance.onend');
+        };
+        utterThis.onerror = function (event) {
+          console.error('SpeechSynthesisUtterance.onerror:', event.error);
+        };
+
+        // Try to find a voice that matches the language
+        // Prioritize exact match, then language prefix match
+        const selectedVoice = voices.find(voice => voice.lang === lang) || 
+                             voices.find(voice => voice.lang.startsWith(lang.substring(0,2))); // e.g., 'en-US' matches 'en'
+        if (selectedVoice) {
+          utterThis.voice = selectedVoice;
+          console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+        } else {
+          console.warn(`No specific voice found for language ${lang}. Using default.`);
+        }
+        utterThis.lang = lang; // Set utterance language
+
+        synth.speak(utterThis);
+        console.log("Speaking:", text, "in language:", lang);
+      }
+    }
+
+    // --- Translation Placeholders (Requires Backend Integration) ---
+    // These functions would typically call a backend API that wraps Google Cloud Translation API
+    async function translateText(text, targetLang) {
+      console.log(`Attempting to translate "${text}" to ${targetLang} (client-side placeholder)`);
+      // Example of how you'd call a backend endpoint for translation:
+      /*
+      try {
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text, target_lang: targetLang })
+        });
+        const data = await response.json();
+        if (data.translated_text) {
+          return data.translated_text;
+        } else {
+          console.error("Translation API error:", data.error);
+          return text; // Return original if translation fails
+        }
+      } catch (error) {
+        console.error("Error during translation fetch:", error);
+        return text; // Return original on network error
+      }
+      */
+      return text; // For now, just return original text (no actual translation)
+    }
+
+    async function detectLanguage(text) {
+      console.log(`Attempting to detect language for "${text}" (client-side placeholder)`);
+      // Example of how you'd call a backend endpoint for language detection:
+      /*
+      try {
+        const response = await fetch('/api/detect_language', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+        const data = await response.json();
+        if (data.detected_language) {
+          return data.detected_language; // e.g., "en", "hi"
+        } else {
+          console.error("Language detection API error:", data.error);
+          return 'en'; // Default to English if detection fails
+        }
+      } catch (error) {
+        console.error("Error during language detection fetch:", error);
+        return 'en'; // Default to English on network error
+      }
+      */
+      return 'en'; // Default to English for placeholder
+    }
+
+
+    // --- Existing Chat Functionality (Modified) ---
+    // Auto-resize textarea
+    userInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // File upload handling
+    fileUpload.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        // Removed fileName and uploadInfo display as requested
+        console.log("File selected:", this.files[0].name);
+      } else {
+        console.log("No file selected.");
+      }
+    });
+    
+    // Removed removeFile event listener as the button is removed
+    
+    // Suggestion click handling
+    suggestions.forEach(suggestion => {
+      suggestion.addEventListener('click', function() {
+        userInput.value = this.textContent;
+        userInput.focus();
+        userInput.dispatchEvent(new Event('input'));
+      });
+    });
+    
+    // Form submission
+    chatForm.addEventListener('submit', async function(e) { // Made async to await translation
+      console.log("Chat form submitted.");
+      e.preventDefault(); // Prevent default form submission behavior
+      
+      const message = userInput.value.trim();
+      const formData = new FormData(this);
+      const selectedLanguage = languageSelector ? languageSelector.value : 'en-US';
+
+      if (!message && !fileInput.files[0]) {
+        console.log("No message or file to send. Aborting submission.");
+        return; // Do nothing if both are empty
+      }
+      
+      // Add user message to chat
+      if (message) {
+        addMessageToChat(message, 'user');
+      }
+      
+      if (fileInput.files[0]) {
+        addMessageToChat(`[Image: ${fileInput.files[0].name}]`, 'user');
+      }
+      
+      // Show thinking indicator
+      const thinkingDiv = document.createElement('div');
+      thinkingDiv.className = 'message bot';
+      thinkingDiv.innerHTML = `
+        <div class="avatar">
+          <img src="static/images/bot.gif" alt="Bot Thinking">
+        </div>
+        <div class="message-content">
+          <div class="thinking">
+            <span>Nutrition Bot is thinking</span>
+            <div class="dot-flashing"></div>
+          </div>
+        </div>
+      `;
+      chatContainer.appendChild(thinkingDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      console.log("Thinking indicator displayed.");
+      
+      // Clear input
+      userInput.value = '';
+      userInput.style.height = 'auto';
+      fileInput.value = '';
+      // uploadInfo.classList.add('hidden'); // Removed
+      console.log("Input fields cleared.");
+
+      // Add target language to formData
+      formData.append('target_language', selectedLanguage);
+      console.log("Sending target_language with request:", selectedLanguage);
+      
+      // Send to server
+      fetch('/chat', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        console.log("Fetch response received. Status:", response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Fetch data received:", data);
+        // Remove thinking indicator
+        if (chatContainer.contains(thinkingDiv)) {
+            chatContainer.removeChild(thinkingDiv);
+            console.log("Thinking indicator removed.");
+        }
+        
+        if (data.error) {
+          addMessageToChat("Sorry, there was an error processing your request: " + data.error, 'bot');
+          console.error("Server returned error:", data.error);
+        } else {
+          addMessageToChat(data.response, 'bot', data.message_id); // Pass message_id
+          // Removed automatic speakText call here
+          console.log("Bot response added to chat.");
+        }
+      })
+      .catch(error => {
+        console.error('Fetch Error:', error);
+        // Remove thinking indicator
+        if (chatContainer.contains(thinkingDiv)) {
+            chatContainer.removeChild(thinkingDiv);
+            console.log("Thinking indicator removed due to error.");
+        }
+        addMessageToChat("Sorry, there was an error connecting to the server. Please check your network or try again.", 'bot');
+      });
+    });
+    
+    // Function to handle feedback submission
+    function sendFeedback(messageId, feedbackType) {
+      console.log(`Sending feedback: messageId=${messageId}, type=${feedbackType}`);
+      fetch('/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message_id: messageId,
+          feedback: feedbackType
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          console.log('Feedback stored successfully:', data.message);
+          // Optionally, disable feedback buttons or show a thank you message
+          const feedbackDiv = document.querySelector(`.message[data-message-id="${messageId}"] .feedback-buttons`);
+          if (feedbackDiv) {
+            feedbackDiv.innerHTML = '<span class="feedback-thanks" style="display:inline;">Thanks for your feedback!</span>';
+          }
+        } else {
+          console.error('Error storing feedback:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error sending feedback:', error);
+      });
+    }
+
+    // Add message to chat container
+    function addMessageToChat(content, sender, messageId = null) {
+      console.log(`Adding message to chat: sender=${sender}, messageId=${messageId}`);
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      if (messageId) {
+        messageDiv.dataset.messageId = messageId; // Store message ID
+      }
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      
+      // Conditionally add either user icon or bot image
+      if (sender === 'user') {
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-user';
+        avatar.appendChild(icon);
+      } else {
+        const img = document.createElement('img');
+        img.src = 'static/images/bot.gif'; // Path to your bot image
+        img.alt = 'Bot Avatar';
+        avatar.appendChild(img);
+      }
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.dataset.rawContent = content; // Store the raw content for TTS
+
+      // Function to process text with basic Markdown (bold, lists) and remove all asterisks
+      function processMarkdown(text) {
+        // Convert **text** to <strong>text</strong>
+        let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Remove any remaining single asterisks from the displayed text
+        processedText = processedText.replace(/\*/g, '');
+        return processedText;
+      }
+      
+      // Check if content contains meal options or nutritional info
+      if (content.includes('Option 1') || content.includes('Breakfast:') || content.includes('Lunch:') || content.includes('Dinner:') || content.includes('Nutritional Info:')) {
+        const sections = content.split(/\n(?=\S)/); // Split on newlines followed by non-whitespace
+
+        sections.forEach(section => {
+          if (section.trim()) {
+            // Check if this is a meal option
+            if (section.match(/Option \d+:/i) || section.match(/(Breakfast|Lunch|Dinner|Snack):/i)) {
+              const mealOptionDiv = document.createElement('div');
+              mealOptionDiv.className = 'meal-option';
+              
+              const titleMatch = section.match(/^(.*?:)/);
+              if (titleMatch) {
+                const title = titleMatch[0];
+                const mealContent = section.slice(title.length).trim();
+                
+                const titleElement = document.createElement('h4');
+                titleElement.innerHTML = processMarkdown(title); // Process title for bolding
+                mealOptionDiv.appendChild(titleElement);
+                
+                const contentParts = mealContent.split('\n');
+                contentParts.forEach(part => {
+                  if (part.trim()) {
+                    const p = document.createElement('p');
+                    p.innerHTML = processMarkdown(part.trim()); // Process content for bolding
+                    mealOptionDiv.appendChild(p);
+                  }
+                });
+              } else {
+                const p = document.createElement('p');
+                p.innerHTML = processMarkdown(section.trim());
+                mealOptionDiv.appendChild(p);
+              }
+              
+              contentDiv.appendChild(mealOptionDiv);
+            } 
+            // Check if this is a nutrition table
+            else if (section.includes('Protein:') || section.includes('Calories:') || section.includes('Nutritional Info:')) {
+                // If it's a "Nutritional Info:" heading, make it bold
+                if (section.includes('Nutritional Info:')) {
+                    const nutritionTitle = document.createElement('p');
+                    nutritionTitle.innerHTML = '<strong>Nutritional Info:</strong>';
+                    contentDiv.appendChild(nutritionTitle);
+                    section = section.replace('Nutritional Info:', '').trim(); // Remove the text from the section for table parsing
+                }
+
+              const table = document.createElement('table');
+              table.className = 'nutrition-table';
+              
+              const tbody = document.createElement('tbody');
+              
+              const rows = section.split('\n');
+              rows.forEach(row => {
+                if (row.trim()) {
+                  const tr = document.createElement('tr');
+                  const parts = row.split(':').map(s => s.trim());
+                  if (parts.length === 2) {
+                    const [key, value] = parts;
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    tr.appendChild(th);
+                    
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                  } else {
+                    // Handle cases where a row might not be key:value, just add as a paragraph
+                    const p = document.createElement('p');
+                    p.innerHTML = processMarkdown(row.trim());
+                    contentDiv.appendChild(p);
+                    return; // Skip adding to table if not key:value
+                  }
+                  tbody.appendChild(tr);
+                }
+              });
+              
+              if (tbody.children.length > 0) { // Only append table if it has rows
+                table.appendChild(tbody);
+                contentDiv.appendChild(table);
+              }
+            } 
+            else {
+              const p = document.createElement('p');
+              p.innerHTML = processMarkdown(section.trim());
+              contentDiv.appendChild(p);
+            }
+          }
+        });
+      } 
+      else {
+        content.split('\n').forEach(paragraph => {
+          if (paragraph.trim()) {
+            const p = document.createElement('p');
+            p.innerHTML = processMarkdown(paragraph.trim()); // Process all paragraphs for bolding
+            contentDiv.appendChild(p);
+          }
+        });
+      }
+      
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(contentDiv);
+
+      // Add feedback buttons for bot messages
+      if (sender === 'bot' && messageId) {
+        const feedbackButtonsDiv = document.createElement('div');
+        feedbackButtonsDiv.className = 'feedback-buttons';
+        feedbackButtonsDiv.innerHTML = `
+          <button class="feedback-btn like-btn" data-feedback-type="like">
+            <i class="fas fa-thumbs-up"></i> Like
+          </button>
+          <button class="feedback-btn dislike-btn" data-feedback-type="dislike">
+            <i class="fas fa-thumbs-down"></i> Dislike
+          </button>
+          <button class="speak-message-btn" title="Speak this message">
+            <i class="fas fa-volume-up"></i>
+          </button>
+        `;
+        contentDiv.appendChild(feedbackButtonsDiv);
+
+        // Add event listeners for feedback buttons
+        feedbackButtonsDiv.querySelectorAll('.feedback-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const feedbackType = this.dataset.feedbackType;
+            sendFeedback(messageId, feedbackType);
+            // Disable buttons after feedback
+            feedbackButtonsDiv.innerHTML = '<span class="feedback-thanks" style="display:inline;">Thanks for your feedback!</span>';
+          });
+        });
+
+        // Add event listener for speak button
+        const speakBtn = feedbackButtonsDiv.querySelector('.speak-message-btn');
+        if (speakBtn) {
+          speakBtn.addEventListener('click', () => {
+            // Get text from data-raw-content to avoid including button text like "LikeDislike"
+            const messageText = contentDiv.dataset.rawContent || contentDiv.textContent; 
+            const currentLang = languageSelector ? languageSelector.value : 'en-US';
+            speakText(messageText, currentLang);
+          });
+        }
+      }
+      
+      chatContainer.appendChild(messageDiv);
+      
+      // Scroll to bottom
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Initial scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+</script>
+</body>
+</html>
+```

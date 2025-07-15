@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Profile - NutritionBot</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: "Segoe UI", sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: -1;
+    }
+
+    .container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .heading-wrapper {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid black;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+
+    .heading {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #b8eaff;
+      text-shadow: 0 0 10px #4fc3f7, 0 0 20px #00e5ff, 0 0 30px #00bcd4;
+      margin-bottom: 0;
+      animation: glow 2s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+
+    @keyframes glow {
+      0% {
+        text-shadow: 0 0 10px #4fc3f7, 0 0 20px #00e5ff;
+      }
+      100% {
+        text-shadow: 0 0 20px #00e5ff, 0 0 40px #00acc1;
+      }
+    }
+
+    .profile-box {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 16px;
+      width: 360px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      animation: fadeInUp 1.5s ease forwards;
+      opacity: 0;
+      animation-delay: 0.5s;
+    }
+
+    .profile-box h2 {
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+    }
+
+    .profile-box input,
+    .profile-box select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #1e1e1e;
+      color: #ffffff;
+    }
+
+    .profile-box button {
+      width: 100%;
+      padding: 12px;
+      background: #00c6ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .profile-box button:hover {
+      background: #007acc;
+    }
+
+    .profile-box p {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .profile-box a {
+      color: #00c6ff;
+      text-decoration: none;
+    }
+
+    .flash-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #ff6b6b; /* Default for danger */
+    }
+    .flash-message.success { color: #34a853; }
+    .flash-message.warning { color: #fbbc05; }
+    .flash-message.info { color: #4285f4; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background Video -->
+<video autoplay muted loop class="video-bg">
+  <source src="{{ url_for('static', filename='videos/bg.mp4') }}" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Overlay -->
+<div class="overlay"></div>
+
+<!-- Main Content -->
+<div class="container">
+
+  <!-- Glowing Heading -->
+  <div class="heading-wrapper">
+    <div class="heading">
+      SMART AI NUTRITION CHAT-BOT BY VERSATILE
+    </div>
+  </div>
+
+  <!-- Profile Edit Box -->
+  <div class="profile-box">
+    <h2>Edit Profile</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash-message {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <input name="name" placeholder="Full Name" required value="{{ user.name }}">
+      <input type="email" name="email" placeholder="Email" value="{{ user.email }}" disabled> {# Email disabled as it's not changed here #}
+      <input type="number" name="age" placeholder="Age" required value="{{ user.age }}">
+
+      <select name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+        <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+        <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+      </select>
+
+      <select name="diet" required>
+        <option value="">Diet Preference</option>
+        <option value="Vegetarian" {% if user.diet == 'Vegetarian' %}selected{% endif %}>Vegetarian</option>
+        <option value="Non-Vegetarian" {% if user.diet == 'Non-Vegetarian' %}selected{% endif %}>Non-Vegetarian</option>
+        <option value="Vegan" {% if user.diet == 'Vegan' %}selected{% endif %}>Vegan</option>
+      </select>
+
+      <select name="goal" required>
+        <option value="">Select Health Goal</option>
+        <option value="Hair" {% if user.goal == 'Hair' %}selected{% endif %}>Hair Health</option>
+        <option value="Skin" {% if user.goal == 'Skin' %}selected{% endif %}>Skin Health</option>
+        <option value="Weight Loss" {% if user.goal == 'Weight Loss' %}selected{% endif %}>Weight Loss</option>
+        <option value="Muscle Gain" {% if user.goal == 'Muscle Gain' %}selected{% endif %}>Muscle Gain</option>
+        <option value="Immunity Boost" {% if user.goal == 'Immunity Boost' %}selected{% endif %}>Immunity Boost</option>
+        <option value="Overall Wellness" {% if user.goal == 'Overall Wellness' %}selected{% endif %}>Overall Wellness</option>
+      </select>
+
+      <!-- New fields for Height, Weight, and Medical Conditions -->
+      <input type="number" name="height_cm" placeholder="Height (cm)" step="0.1" value="{{ user.height_cm if user.height_cm is not none else '' }}">
+      <input type="number" name="weight_kg" placeholder="Weight (kg)" step="0.1" value="{{ user.weight_kg if user.weight_kg is not none else '' }}">
+      
+      <select name="medical_conditions">
+          <option value="None" {% if user.medical_conditions == 'None' %}selected{% endif %}>No Medical Conditions</option>
+          <option value="Diabetes" {% if user.medical_conditions == 'Diabetes' %}selected{% endif %}>Diabetes</option>
+          <option value="Hypertension" {% if user.medical_conditions == 'Hypertension' %}selected{% endif %}>Hypertension</option>
+          <option value="Heart Disease" {% if user.medical_conditions == 'Heart Disease' %}selected{% endif %}>Heart Disease</option>
+          <option value="Kidney Disease" {% if user.medical_conditions == 'Kidney Disease' %}selected{% endif %}>Kidney Disease</option>
+          <option value="Allergies" {% if user.medical_conditions == 'Allergies' %}selected{% endif %}>Allergies</option>
+          <option value="Other">Other (Please specify in chat)</option>
+      </select>
+
+      <!-- New field for Preferred Language -->
+      <select name="preferred_language" id="editProfileLanguageSelector" required>
+          <!-- Options will be populated by JavaScript -->
+      </select>
+
+      <button type="submit">Update Profile</button>
+    </form>
+    <p><a href="{{ url_for('home') }}">Back to Chat</a></p>
+  </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const languageSelector = document.getElementById('editProfileLanguageSelector');
+
+        const languages = [
+            { code: 'en-US', name: 'English (United States)' },
+            { code: 'en-GB', name: 'English (United Kingdom)' },
+            { code: 'hi-IN', name: 'Hindi (India)' },
+            { code: 'es-ES', name: 'Spanish (Spain)' },
+            { code: 'es-MX', name: 'Spanish (Mexico)' },
+            { code: 'fr-FR', name: 'French (France)' },
+            { code: 'de-DE', name: 'German (Germany)' },
+            { code: 'ja-JP', name: 'Japanese (Japan)' },
+            { code: 'zh-CN', name: 'Chinese (Mandarin, Simplified)' },
+            { code: 'zh-TW', name: 'Chinese (Taiwan, Traditional)' },
+            { code: 'ko-KR', name: 'Korean (South Korea)' },
+            { code: 'pt-PT', name: 'Portuguese (Portugal)' },
+            { code: 'pt-BR', name: 'Portuguese (Brazil)' },
+            { code: 'ru-RU', name: 'Russian (Russia)' },
+            { code: 'ar-SA', name: 'Arabic (Saudi Arabia)' },
+            { code: 'it-IT', name: 'Italian (Italy)' },
+            { code: 'nl-NL', name: 'Dutch (Netherlands)' },
+            { code: 'sv-SE', name: 'Swedish (Sweden)' },
+            { code: 'pl-PL', name: 'Polish (Poland)' },
+            { code: 'tr-TR', name: 'Turkish (Turkey)' },
+            { code: 'th-TH', name: 'Thai (Thailand)' },
+            { code: 'vi-VN', name: 'Vietnamese (Vietnam)' },
+            { code: 'id-ID', name: 'Indonesian (Indonesia)' },
+            { code: 'ms-MY', name: 'Malay (Malaysia)' },
+            { code: 'fil-PH', name: 'Filipino (Philippines)' },
+            { code: 'da-DK', name: 'Danish (Denmark)' },
+            { code: 'fi-FI', name: 'Finnish (Finland)' },
+            { code: 'no-NO', name: 'Norwegian (Norway)' },
+            { code: 'he-IL', name: 'Hebrew (Israel)' },
+            { code: 'el-GR', name: 'Greek (Greece)' },
+            { code: 'hu-HU', name: 'Hungarian (Hungary)' },
+            { code: 'cs-CZ', name: 'Czech (Czech Republic)' },
+            { code: 'sk-SK', name: 'Slovak (Slovakia)' },
+            { code: 'ro-RO', name: 'Romanian (Romania)' },
+            { code: 'bg-BG', name: 'Bulgarian (Bulgaria)' },
+            { code: 'uk-UA', name: 'Ukrainian (Ukraine)' },
+            { code: 'hr-HR', name: 'Croatian (Croatia)' },
+            { code: 'sr-RS', name: 'Serbian (Serbia)' },
+            { code: 'sl-SI', name: 'Slovenian (Slovenia)' },
+            { code: 'et-EE', name: 'Estonian (Estonia)' },
+            { code: 'lv-LV', name: 'Latvian (Latvia)' },
+            { code: 'lt-LT', name: 'Lithuanian (Lithuania)' },
+            { code: 'is-IS', name: 'Icelandic (Iceland)' },
+            { code: 'ga-IE', name: 'Irish (Ireland)' },
+            { code: 'cy-GB', name: 'Welsh (United Kingdom)' },
+            { code: 'fa-IR', name: 'Persian (Iran)' },
+            { code: 'ur-PK', name: 'Urdu (Pakistan)' },
+            { code: 'bn-BD', name: 'Bengali (Bangladesh)' },
+            { code: 'gu-IN', name: 'Gujarati (India)' },
+            { code: 'kn-IN', name: 'Kannada (India)' },
+            { code: 'ml-IN', name: 'Malayalam (India)' },
+            { code: 'mr-IN', name: 'Marathi (India)' },
+            { code: 'pa-IN', name: 'Punjabi (India)' },
+            { code: 'ta-IN', name: 'Tamil (India)' },
+            { code: 'te-IN', name: 'Telugu (India)' },
+        ];
+
+        function populateLanguageSelectorOptions() {
+            languageSelector.innerHTML = ''; // Clear existing options
+            languages.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.code;
+                option.textContent = lang.name;
+                languageSelector.appendChild(option);
+            });
+            // Set the selected value based on user.preferred_language
+            // Ensure user.preferred_language is not null/undefined before setting
+            const userPreferredLang = "{{ user.preferred_language if user.preferred_language is not none else 'en-US' }}";
+            if (languageSelector.querySelector(`option[value="${userPreferredLang}"]`)) {
+                languageSelector.value = userPreferredLang;
+            } else {
+                languageSelector.value = 'en-US'; // Fallback to English if user's language is not in the list
+            }
+        }
+
+        populateLanguageSelectorOptions();
+    });
+</script>
+</body>
+</html>

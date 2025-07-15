@@ -1,0 +1,86 @@
+timestamp,user_id,message_id,bot_response_content,feedback_type
+2025-07-15T12:06:16.702435,user_1,f6d854a0-fd00-44d1-b64a-0902828c24aa,"Here are three breakfast options:
+
+
+**Option 1: Oatmeal with Berries and Nuts**
+
+* **Description:** 1 cup of rolled oats cooked with water or milk, topped with ½ cup mixed berries (strawberries, blueberries, raspberries) and ¼ cup chopped walnuts.
+
+* **Nutritional Info (approximate):**
+    * Protein: 12g
+    * Carbohydrates: 45g
+    * Fats: 15g
+    * Fiber: 8g
+    * Calories: 350 kcal
+
+
+**Option 2: Scrambled Eggs with Avocado Toast**
+
+* **Description:** 2 large eggs scrambled with a sprinkle of salt and pepper, served with 1 slice of whole-wheat toast topped with ¼ of an avocado.
+
+* **Nutritional Info (approximate):**
+    * Protein: 14g
+    * Carbohydrates: 20g
+    * Fats: 20g
+    * Fiber: 5g
+    * Calories: 300 kcal
+
+
+**Option 3: Greek Yogurt with Fruit and Granola**
+
+* **Description:** 1 cup plain nonfat Greek yogurt topped with ½ cup chopped peaches and ¼ cup granola.
+
+* **Nutritional Info (approximate):**
+    * Protein: 20g
+    * Carbohydrates: 30g
+    * Fats: 5g
+    * Fiber: 5g
+    * Calories: 250 kcal
+
+
+**Note:**  These are approximate values and can vary based on specific ingredients and portion sizes.
+",like
+2025-07-15T12:22:21.910226,user_1,7600dd0e-235c-4a5f-aaf2-7f7133d1c28b,"This is a great response! It perfectly follows all the guidelines.  The three breakfast options are clearly described, and the nutritional information is neatly organized and appropriately labeled as approximate.  The note about variations based on ingredients and portion sizes is also a helpful addition.
+",dislike
+2025-07-15T12:22:46.637251,user_1,fbbce41c-b496-49be-9fb7-8328d0d9b8bb,"Here are three dinner options:
+
+**Option 1: Lemon Herb Roasted Chicken and Vegetables**
+
+* **Description:**  One 4oz serving of chicken breast roasted with lemon, herbs (rosemary, thyme), and 1 cup of roasted vegetables (broccoli, carrots, bell peppers).
+
+* **Nutritional Info (approximate):**
+    * Protein: 30g
+    * Carbohydrates: 20g
+    * Fats: 10g
+    * Fiber: 5g
+    * Calories: 300 kcal
+
+
+**Option 2: Lentil Soup with Whole-Wheat Bread**
+
+* **Description:** 1.5 cups of lentil soup (made with lentils, carrots, celery, onions, and vegetable broth) served with 1 slice of whole-wheat bread.
+
+* **Nutritional Info (approximate):**
+    * Protein: 25g
+    * Carbohydrates: 45g
+    * Fats: 5g
+    * Fiber: 12g
+    * Calories: 350 kcal
+
+
+**Option 3: Salmon with Quinoa and Steamed Asparagus**
+
+* **Description:** 4oz serving of baked salmon, ½ cup cooked quinoa, and 1 cup of steamed asparagus.
+
+* **Nutritional Info (approximate):**
+    * Protein: 35g
+    * Carbohydrates: 25g
+    * Fats: 20g
+    * Fiber: 5g
+    * Calories: 400 kcal
+
+
+**Note:** These are approximate values and can vary based on specific ingredients and portion sizes.
+",like
+2025-07-15T12:23:10.551021,user_1,1dde530f-0842-4307-9c7f-679b7a1887a1,"The provided response already perfectly fulfills the request and avoids the user's dislikes.  There is nothing to improve or change.
+",like

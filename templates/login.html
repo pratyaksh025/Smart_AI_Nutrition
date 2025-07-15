@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - NutritionBot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: "Segoe UI", sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .video-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%; width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: -1;
+    }
+
+    .container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .heading-wrapper {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid #b8eaff;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+
+    .heading {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #b8eaff;
+      text-shadow: 0 0 10px #4fc3f7, 0 0 20px #00e5ff;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #4fc3f7, 0 0 20px #00e5ff; }
+      to   { text-shadow: 0 0 20px #00e5ff, 0 0 40px #00acc1; }
+    }
+
+    .login-box {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 16px;
+      width: 320px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      color: #ffffff;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #1e1e1e;
+      color: #ffffff;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: #00c6ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .login-box button:hover {
+      background: #007acc;
+    }
+
+    .login-box p {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .login-box a {
+      color: #00c6ff;
+      text-decoration: none;
+    }
+
+    .flash-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+    /* Added style for forgot password link */
+    .forgot-password-link {
+        margin-top: 10px; /* Adjust as needed for spacing */
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🔹 Background video -->
+<video autoplay muted loop class="video-bg">
+  <source src="{{ url_for('static', filename='videos/bg.mp4') }}" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<!-- ✅ Play login.mp4 if login was successful -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, msg in messages %}
+    {% if category == 'success' %}
+      <video autoplay muted class="video-bg" id="loginSuccessVideo" style="position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1000;">
+        <source src="{{ url_for('static', filename='videos/login.mp4') }}" type="video/mp4">
+      </video>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const loginVideo = document.getElementById("loginSuccessVideo");
+          if (loginVideo) {
+            console.log("Login success video element found."); // Debugging line
+            loginVideo.play().catch(error => console.error("Video play failed:", error)); // Add catch for Promise rejection
+            // Remove video after it ends, or after a maximum of 3 seconds if it's short
+            loginVideo.onended = () => {
+              console.log("Login success video ended."); // Debugging line
+              loginVideo.remove();
+            };
+            setTimeout(() => {
+              if (loginVideo && loginVideo.parentNode) { // Check if it hasn't been removed by onended already
+                console.log("Removing login success video after 3 seconds fallback."); // Debugging line
+                loginVideo.remove();
+              }
+            }, 3000); // Fallback to remove after 3 seconds
+          } else {
+            console.log("Login success video element NOT found."); // Debugging line
+          }
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+
+<div class="container">
+  <div class="heading-wrapper">
+    <div class="heading">SMART AI NUTRITION CHAT-BOT BY VERSATILE</div>
+  </div>
+
+  <div class="login-box">
+    <h2>Login</h2>
+    <form method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register</a></p>
+    <p class="forgot-password-link"><a href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a></p>
+
+    {% if error %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+          {% if category != 'success' %}
+            <div class="flash-message" style="color: {% if category == 'danger' %}#ff6b6b{% elif category == 'warning' %}#ffd166{% else %}#ccc{% endif %};">
+              {{ msg }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endwith %}
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>
