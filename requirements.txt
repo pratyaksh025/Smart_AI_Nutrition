@@ -6,7 +6,6 @@ protobuf==3.20.3
 typing-extensions==4.5.0
 opencv-python==4.7.0.72
 
-
 # API & audio
 requests==2.31.0
 gtts==2.5.4
