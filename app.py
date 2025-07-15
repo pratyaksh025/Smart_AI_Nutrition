@@ -8,7 +8,11 @@ import requests # For making requests to external APIs (like Gemini, or a real t
 
 from utils.gemini_api import ask_gemini
 from utils.auth import auth_blueprint, USER_CSV # Import USER_CSV from auth
-from config import FLASK_SECRET_KEY # Import the secret key
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import GEMINI_API_KEY
+
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY # Use the secret key from config.py
